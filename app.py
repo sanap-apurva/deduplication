@@ -1,5 +1,3 @@
-# Deduplication of file And resetting the deduplicated file
-
 import argparse
 import os
 
@@ -7,26 +5,22 @@ import os
 # Function to deduplicate the original file
 def dedupe_file(input_file, output_file):
     try:
-        # Open input file with the correct encoding (e.g., utf-8)
-        with open(input_file, 'r', encoding='utf-8') as infile:
-            content = infile.read()
-
-        # Split content into words and deduplicate (case-insensitive)
-        words = content.split()
-        # print("words", words)
-        unique_words = []
-
-        # Use a set to track unique lowercase versions of words
         seen_words = set()
-        for word in words:
-            lower_word = word.lower()  # Convert word to lowercase
-            if lower_word not in seen_words:
-                unique_words.append(word)
-                seen_words.add(lower_word)
 
-        # Write deduplicated content to output file
-        with open(output_file, 'w', encoding='utf-8') as outfile:
-            outfile.write(' '.join(unique_words))
+        with open(input_file, 'r', encoding='utf-8') as infile, \
+                open(output_file, 'w', encoding='utf-8') as outfile:
+
+            for line in infile:
+                words = line.split()
+                deduped_words = []
+
+                for word in words:
+                    lower_word = word.lower()
+                    if lower_word not in seen_words:
+                        seen_words.add(lower_word)
+                        deduped_words.append(word)
+
+                outfile.write(' '.join(deduped_words) + '\n')
 
         print(f"Deduplication complete. Output saved to {output_file}")
 
@@ -39,12 +33,11 @@ def dedupe_file(input_file, output_file):
 # Function to reset the deduplicated file.
 def reset(deduped_file, output_file):
     try:
-        with open(deduped_file, 'r', encoding='utf-8') as f:
-            deduped_content = f.read()
+        with open(deduped_file, 'r', encoding='utf-8') as infile, \
+                open(output_file, 'w', encoding='utf-8') as outfile:
 
-        # Write deduplicated content back to output file
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(deduped_content)
+            for line in infile:
+                outfile.write(line)
 
         print(f"Reset complete. Output saved to {output_file}")
 
